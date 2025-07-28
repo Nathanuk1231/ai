@@ -75,17 +75,16 @@
     font-size: 3.5rem;
     margin-bottom: 35px;
     user-select: none;
-    color: #fff; /* White base for neon glow */
-    /* Reduced Neon Text Effect */
-    text-shadow:
-      0 0 5px #fff,
-      0 0 8px #fff,
-      0 0 15px #0fa, /* Aqua glow */
-      0 0 25px #0fa;
+    color: var(--green); /* Using green for the title color directly */
     text-align: center;
     letter-spacing: -1px;
-    transition: color 0.4s ease, text-shadow 0.4s ease; /* Transition for text-shadow too */
+    transition: color 0.4s ease; /* Transition for color only now */
   }
+  /* Remove specific neon text shadow for h1 */
+  body.dark h1 {
+    text-shadow: none;
+  }
+
 
   #themeToggle {
     margin-bottom: 40px;
@@ -605,7 +604,7 @@
 
   <div id="eqControls" aria-label="Equalizer controls">
     <div class="eq-slider">
-      <input type="range" id="bass" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+      <input type="range" id="bass" min="-15" max="15" step="1" value="5" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="5" />
       <label for="bass">Bass</label>
     </div>
     <div class="eq-slider">
@@ -690,13 +689,11 @@
     if(body.classList.contains('dark')) {
       body.classList.replace('dark', 'light');
       themeToggle.textContent = 'Switch to Dark Theme';
-      document.querySelector('h1').style.color = '#333'; /* Adjust neon text for light theme */
-      document.querySelector('h1').style.textShadow = 'none'; /* Remove neon effect in light theme */
+      document.querySelector('h1').style.color = getCssVariable('--green'); /* Use the light theme's green */
     } else {
       body.classList.replace('light', 'dark');
       themeToggle.textContent = 'Switch to Light Theme';
-      document.querySelector('h1').style.color = '#fff'; /* Restore white base for neon */
-      document.querySelector('h1').style.textShadow = '0 0 5px #fff, 0 0 8px #fff, 0 0 15px #0fa, 0 0 25px #0fa'; /* Restore neon effect */
+      document.querySelector('h1').style.color = getCssVariable('--green'); /* Use the dark theme's green */
     }
     updateThemeColorsForCanvas();
   });
