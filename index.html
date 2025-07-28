@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Mini Spotify Clone - Responsive</title>
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
@@ -26,20 +26,28 @@
   }
 
   :root {
-    --green: #1db954;
-    --bg-dark: #121212;
-    --text-dark: #fff;
+    --green: #1DB954; /* Spotify Green */
+    --bg-dark: #191414; /* Spotify Darkest Grey */
+    --element-bg-dark: #282828; /* Spotify Lighter Dark Grey */
+    --text-dark: #FFFFFF; /* White */
+    --light-text-dark: #B3B3B3; /* Lighter Grey Text */
+
     --bg-light: #f7f7f7;
+    --element-bg-light: #e0e0e0;
     --text-light: #121212;
   }
 
   body.dark {
     --bg: var(--bg-dark);
     --text: var(--text-dark);
+    --element-bg: var(--element-bg-dark);
+    --light-text: var(--light-text-dark);
   }
   body.light {
     --bg: var(--bg-light);
     --text: var(--text-light);
+    --element-bg: var(--element-bg-light);
+    --light-text: var(--text-light);
   }
 
   h1 {
@@ -54,25 +62,38 @@
 
   #themeToggle {
     margin-bottom: 25px;
-    background: var(--green);
-    border: none;
+    background: var(--element-bg);
+    border: 1px solid var(--green);
     padding: 10px 22px;
     border-radius: 30px;
-    color: var(--bg);
+    color: var(--green);
     font-weight: 600;
     cursor: pointer;
-    box-shadow: 0 0 15px var(--green);
-    transition: background 0.3s ease;
+    box-shadow: 0 0 8px rgba(0,0,0,0.5);
+    transition: background 0.3s ease, border-color 0.3s ease, color 0.3s ease;
     user-select: none;
     max-width: 300px;
   }
   #themeToggle:hover {
-    background: #159540;
+    background: var(--green);
+    color: var(--bg);
+    box-shadow: 0 0 15px var(--green);
+  }
+
+  #spotify-player-container {
+    width: 680px;
+    max-width: 95vw;
+    background: var(--element-bg);
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
   }
 
   #dropZone {
-    width: 640px;
-    max-width: 90vw;
+    width: 100%; /* Fill container */
     height: 130px;
     border: 3px dashed var(--green);
     border-radius: 12px;
@@ -80,38 +101,45 @@
     justify-content: center;
     align-items: center;
     margin-bottom: 25px;
-    color: var(--green);
+    color: var(--light-text);
     font-weight: 600;
     font-size: 1.3rem;
     user-select: none;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
     text-align: center;
     cursor: pointer;
+    position: relative; /* For absolute positioning of input */
+    overflow: hidden; /* Hide potential overflow of input */
   }
   #dropZone.dragover {
     background: var(--green);
-    color: var(--bg);
-    border-color: var(--bg);
+    color: var(--element-bg);
+    border-color: var(--element-bg);
   }
 
   #upload {
-    display: none;
+    position: absolute; /* Make it clickable over dropZone */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0; /* Make it invisible but present */
+    cursor: pointer;
+    z-index: 10; /* Ensure it's on top */
   }
 
   audio {
-    width: 640px;
-    max-width: 90vw;
+    width: 100%; /* Fill container */
     outline: none;
-    border-radius: 12px;
-    box-shadow: 0 0 25px var(--green);
-    background: var(--bg-dark);
-    margin-bottom: 40px;
+    border-radius: 8px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    background: #000; /* Always dark for audio player */
+    margin-bottom: 30px;
     user-select: none;
   }
 
   #controls {
-    width: 640px;
-    max-width: 90vw;
+    width: 100%; /* Fill container */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -125,10 +153,10 @@
     width: 150px;
     height: 8px;
     border-radius: 8px;
-    background: var(--bg-dark);
+    background: var(--bg-dark); /* Dark track */
     cursor: pointer;
     outline: none;
-    box-shadow: 0 0 8px var(--green);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
     transition: background 0.3s ease;
   }
   #volume::-webkit-slider-thumb {
@@ -154,53 +182,55 @@
   #playPause {
     background: var(--green);
     border: none;
-    color: var(--bg);
+    color: var(--text-dark); /* White text */
     font-weight: 700;
     font-size: 1.2rem;
-    padding: 10px 20px;
+    padding: 10px 25px;
     border-radius: 50px;
     box-shadow: 0 0 15px var(--green);
     cursor: pointer;
     user-select: none;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, box-shadow 0.3s ease;
     flex-shrink: 0;
     min-width: 120px;
     text-align: center;
   }
   #playPause:hover {
-    background: #159540;
+    background: #1ED760; /* Slightly lighter green on hover */
+    box-shadow: 0 0 20px var(--green);
   }
 
   #visualizer {
-    width: 640px;
-    max-width: 90vw;
+    width: 100%; /* Fill container */
     height: 130px;
     border-radius: 12px;
-    box-shadow: 0 0 25px var(--green);
-    background: var(--bg-dark);
-    margin-bottom: 40px;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+    background: #000; /* Dark background for visualizer */
+    margin-bottom: 30px;
   }
 
   #eqControls {
-    width: 640px;
-    max-width: 90vw;
+    width: 100%; /* Fill container */
     display: flex;
     justify-content: space-between;
-    gap: 15px;
-    margin-bottom: 40px;
+    gap: 20px;
+    margin-bottom: 30px;
     user-select: none;
+    flex-wrap: wrap; /* Allow wrapping on smaller screens */
   }
 
   .eq-slider {
     flex: 1;
+    min-width: 120px; /* Ensure sliders don't get too small */
     display: flex;
     flex-direction: column;
     align-items: center;
-    color: var(--text);
+    color: var(--light-text);
   }
   .eq-slider label {
     margin-bottom: 8px;
     font-weight: 600;
+    font-size: 0.95rem;
   }
   .eq-slider input[type=range] {
     -webkit-appearance: none;
@@ -210,7 +240,7 @@
     background: var(--bg-dark);
     cursor: pointer;
     outline: none;
-    box-shadow: 0 0 8px var(--green);
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.3);
     transition: background 0.3s ease;
   }
   .eq-slider input[type=range]::-webkit-slider-thumb {
@@ -234,66 +264,93 @@
   }
 
   #playlist {
-    width: 640px;
-    max-width: 90vw;
-    max-height: 160px;
+    width: 100%; /* Fill container */
+    max-height: 200px;
     overflow-y: auto;
-    background: var(--bg-dark);
+    background: var(--bg-dark); /* Slightly darker than main element bg */
     border-radius: 12px;
-    box-shadow: inset 0 0 10px #00000099;
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
     padding: 15px 20px;
     user-select: none;
+    color: var(--light-text);
   }
+
+  /* Custom scrollbar for Webkit browsers */
+  #playlist::-webkit-scrollbar {
+    width: 8px;
+  }
+  #playlist::-webkit-scrollbar-track {
+    background: var(--element-bg);
+    border-radius: 10px;
+  }
+  #playlist::-webkit-scrollbar-thumb {
+    background: var(--green);
+    border-radius: 10px;
+  }
+  #playlist::-webkit-scrollbar-thumb:hover {
+    background: #1ED760;
+  }
+
   #playlist div {
-    padding: 8px 12px;
+    padding: 10px 15px;
     border-radius: 8px;
     margin-bottom: 8px;
     cursor: pointer;
-    transition: background 0.3s ease;
+    transition: background 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+    white-space: nowrap; /* Prevent text wrapping */
+    overflow: hidden; /* Hide overflow text */
+    text-overflow: ellipsis; /* Add ellipsis for overflow */
   }
-  #playlist div:hover,
+  #playlist div:last-child {
+    margin-bottom: 0;
+  }
+  #playlist div:hover:not(.active) {
+    background: rgba(var(--green), 0.2); /* Subtle green hover */
+    color: var(--text);
+  }
   #playlist .active {
     background: var(--green);
-    color: var(--bg-dark);
-    box-shadow: 0 0 10px var(--green);
+    color: var(--bg-dark); /* Dark text on green background */
+    box-shadow: 0 0 12px var(--green);
   }
 
   /* Responsive - Mobile first */
 
-  @media (max-width: 700px) {
+  @media (max-width: 768px) {
     h1 {
-      font-size: 2.4rem;
+      font-size: 2.5rem;
+    }
+    #spotify-player-container {
+      padding: 20px;
     }
     #themeToggle {
       width: 100%;
       max-width: none;
       padding: 12px 0;
-      font-size: 1.2rem;
+      font-size: 1.1rem;
     }
 
     #dropZone {
-      height: 120px;
+      height: 110px;
       font-size: 1.1rem;
       padding: 0 15px;
     }
 
     audio {
-      width: 100%;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
     }
 
     #controls {
       flex-direction: column;
       align-items: stretch;
       gap: 12px;
-      width: 100%;
       margin-bottom: 25px;
     }
 
     #playPause {
       min-width: unset;
       width: 100%;
-      font-size: 1.4rem;
+      font-size: 1.3rem;
       padding: 14px 0;
     }
 
@@ -302,31 +359,44 @@
       height: 10px;
     }
 
+    #visualizer {
+      height: 110px;
+      margin-bottom: 25px;
+    }
+
     #eqControls {
       flex-direction: column;
       gap: 20px;
+      margin-bottom: 25px;
+    }
+
+    .eq-slider {
+      min-width: unset; /* Allow full width on mobile */
       width: 100%;
-      margin-bottom: 30px;
     }
 
     #playlist {
       max-height: 180px;
-      width: 100%;
       padding: 10px 15px;
-      font-size: 0.9rem;
     }
 
     #playlist div {
-      padding: 10px 15px;
-      font-size: 1.1rem;
-    }
-
-    #visualizer {
-      width: 100%;
-      height: 110px;
-      margin-bottom: 35px;
+      font-size: 0.95rem;
     }
   }
+
+  @media (max-width: 480px) {
+    h1 {
+      font-size: 2rem;
+    }
+    #spotify-player-container {
+      padding: 15px;
+    }
+    #dropZone {
+      font-size: 1rem;
+    }
+  }
+
 </style>
 </head>
 <body class="dark">
@@ -334,35 +404,37 @@
 <h1>Mini Spotify Clone</h1>
 <button id="themeToggle">Switch to Light Theme</button>
 
-<div id="dropZone" tabindex="0" aria-label="Drag and drop audio files here or click to browse">Drag & Drop Audio Files or Click to Browse
-  <input type="file" id="upload" accept="audio/*" multiple />
-</div>
-
-<audio id="audio" controls></audio>
-
-<div id="controls">
-  <button id="playPause">Play</button>
-  <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume control" />
-</div>
-
-<canvas id="visualizer"></canvas>
-
-<div id="eqControls" aria-label="Equalizer controls">
-  <div class="eq-slider">
-    <label for="bass">Bass</label>
-    <input type="range" id="bass" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+<div id="spotify-player-container">
+  <div id="dropZone" tabindex="0" aria-label="Drag and drop audio files here or click to browse">Drag & Drop Audio Files or Click to Browse
+    <input type="file" id="upload" accept="audio/*" multiple />
   </div>
-  <div class="eq-slider">
-    <label for="mid">Mid</label>
-    <input type="range" id="mid" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
-  </div>
-  <div class="eq-slider">
-    <label for="treble">Treble</label>
-    <input type="range" id="treble" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
-  </div>
-</div>
 
-<div id="playlist" role="list" aria-label="Playlist"></div>
+  <audio id="audio" controls></audio>
+
+  <div id="controls">
+    <button id="playPause">Play</button>
+    <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume control" />
+  </div>
+
+  <canvas id="visualizer"></canvas>
+
+  <div id="eqControls" aria-label="Equalizer controls">
+    <div class="eq-slider">
+      <label for="bass">Bass</label>
+      <input type="range" id="bass" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+    </div>
+    <div class="eq-slider">
+      <label for="mid">Mid</label>
+      <input type="range" id="mid" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+    </div>
+    <div class="eq-slider">
+      <label for="treble">Treble</label>
+      <input type="range" id="treble" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+    </div>
+  </div>
+
+  <div id="playlist" role="list" aria-label="Playlist"></div>
+</div>
 
 <script>
   const body = document.body;
@@ -387,13 +459,23 @@
   let gainNode;
   let bassEQ, midEQ, trebleEQ;
 
+  // Function to get computed style variables
+  function getCssVariable(name) {
+    return getComputedStyle(document.body).getPropertyValue(name).trim();
+  }
+
+  // Variables to hold computed colors for canvas
+  let spotifyGreen = getCssVariable('--green');
+  let baseColorForVisualizer; // Will be set based on theme
+
   // Setup canvas size
   function resizeCanvas() {
-    canvas.width = canvas.clientWidth * devicePixelRatio;
-    canvas.height = canvas.clientHeight * devicePixelRatio;
-    ctx.scale(devicePixelRatio, devicePixelRatio);
+    canvas.width = canvas.clientWidth * (window.devicePixelRatio || 1);
+    canvas.height = canvas.clientHeight * (window.devicePixelRatio || 1);
+    ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
   }
   window.addEventListener('resize', resizeCanvas);
+  // Initial resize
   resizeCanvas();
 
   // Theme toggle
@@ -405,6 +487,9 @@
       body.classList.replace('light', 'dark');
       themeToggle.textContent = 'Switch to Light Theme';
     }
+    // Update computed colors after theme change
+    spotifyGreen = getCssVariable('--green');
+    // No need to call drawVisualizer() explicitly here, requestAnimationFrame will keep it going
   });
 
   // Playlist and playback
@@ -412,7 +497,8 @@
   let currentIndex = -1;
 
   function setupAudioContext() {
-    if (audioContext) return;
+    // Check if audioContext is already created and running
+    if (audioContext && audioContext.state === 'running') return;
 
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
     source = audioContext.createMediaElementSource(audio);
@@ -420,21 +506,21 @@
 
     bassEQ = audioContext.createBiquadFilter();
     bassEQ.type = "lowshelf";
-    bassEQ.frequency.value = 200;
+    bassEQ.frequency.value = 200; // Bass frequencies up to 200 Hz
 
     midEQ = audioContext.createBiquadFilter();
     midEQ.type = "peaking";
-    midEQ.frequency.value = 1000;
-    midEQ.Q.value = 1;
+    midEQ.frequency.value = 1000; // Mid-range centered around 1000 Hz
+    midEQ.Q.value = 1; // Quality factor
 
     trebleEQ = audioContext.createBiquadFilter();
     trebleEQ.type = "highshelf";
-    trebleEQ.frequency.value = 3000;
+    trebleEQ.frequency.value = 3000; // Treble frequencies from 3000 Hz upwards
 
     analyser = audioContext.createAnalyser();
-    analyser.fftSize = 256;
-    bufferLength = analyser.frequencyBinCount;
-    dataArray = new Uint8Array(bufferLength);
+    analyser.fftSize = 256; // Fast Fourier Transform size
+    bufferLength = analyser.frequencyBinCount; // Number of data points available for frequency data
+    dataArray = new Uint8Array(bufferLength); // Array to hold frequency data (0-255)
 
     // Chain: source -> bass -> mid -> treble -> gain -> analyser -> destination
     source.connect(bassEQ);
@@ -443,12 +529,20 @@
     trebleEQ.connect(gainNode);
     gainNode.connect(analyser);
     analyser.connect(audioContext.destination);
+
+    // Set initial EQ gains based on slider values
+    gainNode.gain.value = volumeControl.value;
+    bassEQ.gain.value = bassControl.value;
+    midEQ.gain.value = midControl.value;
+    trebleEQ.gain.value = trebleControl.value;
   }
 
   // Play/Pause button
   playPauseBtn.addEventListener('click', () => {
-    setupAudioContext();
-    if(audioContext.state === 'suspended') audioContext.resume();
+    setupAudioContext(); // Ensure audio context is ready
+    if(audioContext.state === 'suspended') {
+      audioContext.resume(); // Resume if suspended (e.g., on first user interaction)
+    }
     if(audio.paused) {
       audio.play();
       playPauseBtn.textContent = 'Pause';
@@ -460,62 +554,75 @@
 
   // Volume control
   volumeControl.addEventListener('input', () => {
-    if(!gainNode) return;
-    gainNode.gain.value = volumeControl.value;
+    // Only update if gainNode exists (context initialized)
+    if(gainNode) {
+      gainNode.gain.value = parseFloat(volumeControl.value);
+    }
   });
 
   // EQ controls
   bassControl.addEventListener('input', () => {
-    if(!bassEQ) return;
-    bassEQ.gain.value = bassControl.value;
+    if(bassEQ) bassEQ.gain.value = parseFloat(bassControl.value);
   });
   midControl.addEventListener('input', () => {
-    if(!midEQ) return;
-    midEQ.gain.value = midControl.value;
+    if(midEQ) midEQ.gain.value = parseFloat(midControl.value);
   });
   trebleControl.addEventListener('input', () => {
-    if(!trebleEQ) return;
-    trebleEQ.gain.value = trebleControl.value;
+    if(trebleEQ) trebleEQ.gain.value = parseFloat(trebleControl.value);
   });
 
-  // Visualizer
+  // Visualizer drawing function
   function drawVisualizer() {
     requestAnimationFrame(drawVisualizer);
+
+    if (!analyser) { // Don't draw if analyser isn't ready
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      return;
+    }
 
     analyser.getByteFrequencyData(dataArray);
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    const barWidth = (canvas.width / bufferLength) * 2.5 / devicePixelRatio;
-    let barHeight;
+    // Calculate bar width dynamically based on canvas width and number of data points
+    const barWidth = (canvas.width / bufferLength) * 1.8; // Adjusted multiplier for better spacing
     let x = 0;
 
-    let baseColor = body.classList.contains('dark') ? '#1DB954' : '#1B6E34';
+    // Determine base color based on current theme, using actual color values
+    baseColorForVisualizer = body.classList.contains('dark') ? 'rgba(29, 185, 84, 0.7)' : 'rgba(27, 110, 52, 0.7)';
+    spotifyGreen = getCssVariable('--green'); // Ensure spotifyGreen is always up-to-date
 
     for(let i = 0; i < bufferLength; i++) {
       barHeight = dataArray[i];
-      // Gradient color effect on bars
-      const gradient = ctx.createLinearGradient(x, canvas.height / devicePixelRatio, x + barWidth, canvas.height / devicePixelRatio - barHeight);
-      gradient.addColorStop(0, baseColor);
-      gradient.addColorStop(1, `rgba(29, 185, 84, ${barHeight / 255})`);
-      ctx.fillStyle = gradient;
 
-      ctx.fillRect(x, canvas.height / devicePixelRatio - barHeight, barWidth, barHeight);
-      x += barWidth + 1;
+      // Create a gradient for each bar for a more vibrant look
+      const gradient = ctx.createLinearGradient(x, canvas.height, x + barWidth, 0);
+      gradient.addColorStop(0, baseColorForVisualizer);
+      gradient.addColorStop(1, spotifyGreen); // Use the computed color here
+
+      ctx.fillStyle = gradient;
+      // Draw rectangles for visualizer bars
+      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+      x += barWidth + 2; // Add a small gap between bars
     }
   }
+  // Start the visualizer animation loop
   drawVisualizer();
+
 
   // Playlist UI update
   function updatePlaylistUI() {
-    playlistEl.innerHTML = '';
+    playlistEl.innerHTML = ''; // Clear existing list
     playlist.forEach((track, i) => {
       const div = document.createElement('div');
       div.textContent = track.name;
       div.setAttribute('role', 'listitem');
-      if(i === currentIndex) div.classList.add('active');
+      if(i === currentIndex) {
+        div.classList.add('active'); // Add active class for current track
+        div.setAttribute('aria-current', 'true');
+      }
       div.addEventListener('click', () => {
-        playTrack(i);
+        playTrack(i); // Play track when clicked
       });
       playlistEl.appendChild(div);
     });
@@ -523,38 +630,62 @@
 
   // Play track by index
   function playTrack(index) {
-    if(index < 0 || index >= playlist.length) return;
-    currentIndex = index;
-    audio.src = playlist[currentIndex].url;
-    audio.play();
-    playPauseBtn.textContent = 'Pause';
-    updatePlaylistUI();
+    if(index < 0 || index >= playlist.length) {
+      console.warn("Invalid playlist index:", index);
+      return; // Exit if index is out of bounds
+    }
+    currentIndex = index; // Update current track index
+    audio.src = playlist[currentIndex].url; // Set audio source
+    setupAudioContext(); // Ensure context is ready before playing
+    audio.play()
+      .then(() => {
+        playPauseBtn.textContent = 'Pause'; // Update button text
+      })
+      .catch(error => {
+        console.error("Audio playback failed:", error);
+        // Inform user if playback fails (e.g., due to browser restrictions)
+        playPauseBtn.textContent = 'Play';
+      });
+    updatePlaylistUI(); // Update playlist highlighting
   }
 
   // Handle file uploads from input or drag/drop
   function handleFiles(files) {
+    let newFilesAdded = false;
     for (const file of files) {
-      if(file.type.startsWith('audio/')) {
+      if(file.type.startsWith('audio/')) { // Only process audio files
         const url = URL.createObjectURL(file);
         playlist.push({ url, name: file.name });
+        newFilesAdded = true;
+      } else {
+        console.warn(`File ${file.name} is not an audio file and was skipped.`);
       }
     }
-    if(currentIndex === -1 && playlist.length > 0) playTrack(0);
-    else updatePlaylistUI();
+    if(newFilesAdded) {
+      // If no track is currently playing or playlist was empty, start first added track
+      if(currentIndex === -1 || playlist.length === files.length) {
+        playTrack(0);
+      } else {
+        updatePlaylistUI(); // Otherwise, just update the list
+      }
+    }
   }
 
-  // Drop zone drag/drop handling
-  dropZone.addEventListener('click', () => upload.click());
+  // Drop zone click and keyboard handling
+  // The input is positioned invisibly over the dropZone, so clicking dropZone clicks the input.
+  // This allows the default file input dialog to open.
   dropZone.addEventListener('keydown', e => {
     if(e.key === 'Enter' || e.key === ' ') {
-      e.preventDefault();
-      upload.click();
+      e.preventDefault(); // Prevent scrolling if spacebar is pressed
+      upload.click(); // Programmatically click the hidden file input
     }
   });
 
+  // Drag and drop event listeners
   dropZone.addEventListener('dragover', e => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default behavior to allow drop
     dropZone.classList.add('dragover');
+    e.dataTransfer.dropEffect = 'copy'; // Visual feedback
   });
 
   dropZone.addEventListener('dragleave', e => {
@@ -566,21 +697,40 @@
     e.preventDefault();
     dropZone.classList.remove('dragover');
     if(e.dataTransfer.files.length > 0) {
-      handleFiles(e.dataTransfer.files);
+      handleFiles(e.dataTransfer.files); // Process dropped files
     }
   });
 
+  // Handle file selection via input change
   upload.addEventListener('change', e => {
     handleFiles(e.target.files);
+    e.target.value = ''; // Clear the input so same file can be selected again
   });
 
   // Reset play button when audio ends
   audio.addEventListener('ended', () => {
     playPauseBtn.textContent = 'Play';
+    // Optionally play next track
+    if (currentIndex !== -1 && currentIndex < playlist.length - 1) {
+      playTrack(currentIndex + 1);
+    } else {
+      currentIndex = -1; // Reset if it was the last track
+      updatePlaylistUI();
+    }
   });
 
-  // Initialize volume to 0.5
-  volumeControl.value = 0.5;
+  audio.addEventListener('pause', () => {
+    playPauseBtn.textContent = 'Play';
+  });
+
+  audio.addEventListener('play', () => {
+    playPauseBtn.textContent = 'Pause';
+  });
+
+  // Initialize volume to 0.5 (as set in HTML)
+  // Ensure audio context is setup if user interacts with volume before playing
+  volumeControl.addEventListener('mouseup', () => setupAudioContext());
+  volumeControl.addEventListener('touchend', () => setupAudioContext());
 
 </script>
 </body>
