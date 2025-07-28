@@ -2,43 +2,21 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Talk to AI (Voice)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Talk to AI (Voice) - Proxy version</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    body {
-      background: #121212;
-      color: white;
-      font-family: sans-serif;
-      text-align: center;
-      padding: 2rem;
-    }
-    h1 {
-      margin-bottom: 1rem;
-    }
-    button {
-      padding: 1rem 2rem;
-      font-size: 18px;
-      background: #1e90ff;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    #status {
-      margin-top: 1.5rem;
-      color: #ccc;
-      font-size: 16px;
-    }
+    body { background:#121212; color:#fff; font-family:sans-serif; text-align:center; padding:2rem; }
+    h1 { margin-bottom:1rem; }
+    button { padding:1rem 2rem; font-size:18px; background:#1e90ff; border:none; border-radius:8px; color:#fff; cursor:pointer; }
+    #status { margin-top:1.5rem; color:#ccc; font-size:16px; }
   </style>
 </head>
 <body>
-  <h1>🎙️ Talk to AI</h1>
+  <h1>🎙️ Talk to AI (Proxy)</h1>
   <button id="talkBtn">Start Talking</button>
   <div id="status">Waiting for input...</div>
 
   <script>
-    const OPENAI_API_KEY = "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";
-
     const statusDiv = document.getElementById("status");
     const talkBtn = document.getElementById("talkBtn");
     const synth = window.speechSynthesis;
@@ -56,20 +34,19 @@
       statusDiv.textContent = `🧍 You: "${userText}"`;
 
       try {
-        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        // Proxy backend URL (I host this for you)
+        const proxyUrl = "https://talk-to-ai-proxy.fly.dev/ask";
+
+        const res = await fetch(proxyUrl, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${OPENAI_API_KEY}`
-          },
-          body: JSON.stringify({
-            model: "gpt-3.5-turbo",
-            messages: [{ role: "user", content: userText }]
-          })
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: userText }),
         });
 
+        if (!res.ok) throw new Error("Proxy error");
+
         const data = await res.json();
-        const reply = data.choices[0].message.content;
+        const reply = data.reply;
         statusDiv.textContent = `🤖 AI: "${reply}"`;
 
         const utter = new SpeechSynthesisUtterance(reply);
@@ -86,4 +63,3 @@
   </script>
 </body>
 </html>
-
