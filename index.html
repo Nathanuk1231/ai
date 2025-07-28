@@ -1,65 +1,587 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Talk to AI (Voice) - Proxy version</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    body { background:#121212; color:#fff; font-family:sans-serif; text-align:center; padding:2rem; }
-    h1 { margin-bottom:1rem; }
-    button { padding:1rem 2rem; font-size:18px; background:#1e90ff; border:none; border-radius:8px; color:#fff; cursor:pointer; }
-    #status { margin-top:1.5rem; color:#ccc; font-size:16px; }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Mini Spotify Clone - Responsive</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap');
+
+  /* Reset & base */
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    font-family: 'Montserrat', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px 15px;
+    background: var(--bg);
+    color: var(--text);
+    transition: background 0.4s, color 0.4s;
+  }
+
+  :root {
+    --green: #1db954;
+    --bg-dark: #121212;
+    --text-dark: #fff;
+    --bg-light: #f7f7f7;
+    --text-light: #121212;
+  }
+
+  body.dark {
+    --bg: var(--bg-dark);
+    --text: var(--text-dark);
+  }
+  body.light {
+    --bg: var(--bg-light);
+    --text: var(--text-light);
+  }
+
+  h1 {
+    font-weight: 700;
+    font-size: 3rem;
+    margin-bottom: 25px;
+    user-select: none;
+    color: var(--green);
+    text-shadow: 0 0 12px var(--green);
+    text-align: center;
+  }
+
+  #themeToggle {
+    margin-bottom: 25px;
+    background: var(--green);
+    border: none;
+    padding: 10px 22px;
+    border-radius: 30px;
+    color: var(--bg);
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--green);
+    transition: background 0.3s ease;
+    user-select: none;
+    max-width: 300px;
+  }
+  #themeToggle:hover {
+    background: #159540;
+  }
+
+  #dropZone {
+    width: 640px;
+    max-width: 90vw;
+    height: 130px;
+    border: 3px dashed var(--green);
+    border-radius: 12px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 25px;
+    color: var(--green);
+    font-weight: 600;
+    font-size: 1.3rem;
+    user-select: none;
+    transition: background 0.3s ease;
+    text-align: center;
+    cursor: pointer;
+  }
+  #dropZone.dragover {
+    background: var(--green);
+    color: var(--bg);
+    border-color: var(--bg);
+  }
+
+  #upload {
+    display: none;
+  }
+
+  audio {
+    width: 640px;
+    max-width: 90vw;
+    outline: none;
+    border-radius: 12px;
+    box-shadow: 0 0 25px var(--green);
+    background: var(--bg-dark);
+    margin-bottom: 40px;
+    user-select: none;
+  }
+
+  #controls {
+    width: 640px;
+    max-width: 90vw;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    flex-wrap: wrap;
+    gap: 15px;
+  }
+
+  #volume {
+    -webkit-appearance: none;
+    width: 150px;
+    height: 8px;
+    border-radius: 8px;
+    background: var(--bg-dark);
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 8px var(--green);
+    transition: background 0.3s ease;
+  }
+  #volume::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--green);
+    transition: background 0.3s ease;
+  }
+  #volume::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--green);
+    transition: background 0.3s ease;
+  }
+
+  #playPause {
+    background: var(--green);
+    border: none;
+    color: var(--bg);
+    font-weight: 700;
+    font-size: 1.2rem;
+    padding: 10px 20px;
+    border-radius: 50px;
+    box-shadow: 0 0 15px var(--green);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.3s ease;
+    flex-shrink: 0;
+    min-width: 120px;
+    text-align: center;
+  }
+  #playPause:hover {
+    background: #159540;
+  }
+
+  #visualizer {
+    width: 640px;
+    max-width: 90vw;
+    height: 130px;
+    border-radius: 12px;
+    box-shadow: 0 0 25px var(--green);
+    background: var(--bg-dark);
+    margin-bottom: 40px;
+  }
+
+  #eqControls {
+    width: 640px;
+    max-width: 90vw;
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 40px;
+    user-select: none;
+  }
+
+  .eq-slider {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--text);
+  }
+  .eq-slider label {
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+  .eq-slider input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    height: 8px;
+    border-radius: 8px;
+    background: var(--bg-dark);
+    cursor: pointer;
+    outline: none;
+    box-shadow: 0 0 8px var(--green);
+    transition: background 0.3s ease;
+  }
+  .eq-slider input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 20px;
+    height: 20px;
+    background: var(--green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--green);
+    transition: background 0.3s ease;
+  }
+  .eq-slider input[type=range]::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background: var(--green);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0 0 10px var(--green);
+    transition: background 0.3s ease;
+  }
+
+  #playlist {
+    width: 640px;
+    max-width: 90vw;
+    max-height: 160px;
+    overflow-y: auto;
+    background: var(--bg-dark);
+    border-radius: 12px;
+    box-shadow: inset 0 0 10px #00000099;
+    padding: 15px 20px;
+    user-select: none;
+  }
+  #playlist div {
+    padding: 8px 12px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  #playlist div:hover,
+  #playlist .active {
+    background: var(--green);
+    color: var(--bg-dark);
+    box-shadow: 0 0 10px var(--green);
+  }
+
+  /* Responsive - Mobile first */
+
+  @media (max-width: 700px) {
+    h1 {
+      font-size: 2.4rem;
+    }
+    #themeToggle {
+      width: 100%;
+      max-width: none;
+      padding: 12px 0;
+      font-size: 1.2rem;
+    }
+
+    #dropZone {
+      height: 120px;
+      font-size: 1.1rem;
+      padding: 0 15px;
+    }
+
+    audio {
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    #controls {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 12px;
+      width: 100%;
+      margin-bottom: 25px;
+    }
+
+    #playPause {
+      min-width: unset;
+      width: 100%;
+      font-size: 1.4rem;
+      padding: 14px 0;
+    }
+
+    #volume {
+      width: 100%;
+      height: 10px;
+    }
+
+    #eqControls {
+      flex-direction: column;
+      gap: 20px;
+      width: 100%;
+      margin-bottom: 30px;
+    }
+
+    #playlist {
+      max-height: 180px;
+      width: 100%;
+      padding: 10px 15px;
+      font-size: 0.9rem;
+    }
+
+    #playlist div {
+      padding: 10px 15px;
+      font-size: 1.1rem;
+    }
+
+    #visualizer {
+      width: 100%;
+      height: 110px;
+      margin-bottom: 35px;
+    }
+  }
+</style>
 </head>
-<body>
-  <h1>🎙️ Talk to AI (Proxy)</h1>
-  <button id="talkBtn">Start Talking</button>
-  <div id="status">Waiting for input...</div>
+<body class="dark">
 
-  <script>
-    const statusDiv = document.getElementById("status");
-    const talkBtn = document.getElementById("talkBtn");
-    const synth = window.speechSynthesis;
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-    recognition.lang = "en-US";
-    recognition.interimResults = false;
+<h1>Mini Spotify Clone</h1>
+<button id="themeToggle">Switch to Light Theme</button>
 
-    talkBtn.onclick = () => {
-      recognition.start();
-      statusDiv.textContent = "🎤 Listening...";
-    };
+<div id="dropZone" tabindex="0" aria-label="Drag and drop audio files here or click to browse">Drag & Drop Audio Files or Click to Browse
+  <input type="file" id="upload" accept="audio/*" multiple />
+</div>
 
-    recognition.onresult = async (event) => {
-      const userText = event.results[0][0].transcript;
-      statusDiv.textContent = `🧍 You: "${userText}"`;
+<audio id="audio" controls></audio>
 
-      try {
-        // Proxy backend URL (I host this for you)
-        const proxyUrl = "https://talk-to-ai-proxy.fly.dev/ask";
+<div id="controls">
+  <button id="playPause">Play</button>
+  <input type="range" id="volume" min="0" max="1" step="0.01" value="0.5" aria-label="Volume control" />
+</div>
 
-        const res = await fetch(proxyUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: userText }),
-        });
+<canvas id="visualizer"></canvas>
 
-        if (!res.ok) throw new Error("Proxy error");
+<div id="eqControls" aria-label="Equalizer controls">
+  <div class="eq-slider">
+    <label for="bass">Bass</label>
+    <input type="range" id="bass" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+  </div>
+  <div class="eq-slider">
+    <label for="mid">Mid</label>
+    <input type="range" id="mid" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+  </div>
+  <div class="eq-slider">
+    <label for="treble">Treble</label>
+    <input type="range" id="treble" min="-15" max="15" step="1" value="0" aria-valuemin="-15" aria-valuemax="15" aria-valuenow="0" />
+  </div>
+</div>
 
-        const data = await res.json();
-        const reply = data.reply;
-        statusDiv.textContent = `🤖 AI: "${reply}"`;
+<div id="playlist" role="list" aria-label="Playlist"></div>
 
-        const utter = new SpeechSynthesisUtterance(reply);
-        utter.lang = "en-US";
-        synth.speak(utter);
-      } catch (err) {
-        statusDiv.textContent = "❌ Failed to fetch AI reply.";
+<script>
+  const body = document.body;
+  const themeToggle = document.getElementById('themeToggle');
+  const dropZone = document.getElementById('dropZone');
+  const upload = document.getElementById('upload');
+  const audio = document.getElementById('audio');
+  const playPauseBtn = document.getElementById('playPause');
+  const volumeControl = document.getElementById('volume');
+  const canvas = document.getElementById('visualizer');
+  const ctx = canvas.getContext('2d');
+  const bassControl = document.getElementById('bass');
+  const midControl = document.getElementById('mid');
+  const trebleControl = document.getElementById('treble');
+  const playlistEl = document.getElementById('playlist');
+
+  let audioContext;
+  let source;
+  let analyser;
+  let dataArray;
+  let bufferLength;
+  let gainNode;
+  let bassEQ, midEQ, trebleEQ;
+
+  // Setup canvas size
+  function resizeCanvas() {
+    canvas.width = canvas.clientWidth * devicePixelRatio;
+    canvas.height = canvas.clientHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Theme toggle
+  themeToggle.addEventListener('click', () => {
+    if(body.classList.contains('dark')) {
+      body.classList.replace('dark', 'light');
+      themeToggle.textContent = 'Switch to Dark Theme';
+    } else {
+      body.classList.replace('light', 'dark');
+      themeToggle.textContent = 'Switch to Light Theme';
+    }
+  });
+
+  // Playlist and playback
+  let playlist = [];
+  let currentIndex = -1;
+
+  function setupAudioContext() {
+    if (audioContext) return;
+
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    source = audioContext.createMediaElementSource(audio);
+    gainNode = audioContext.createGain();
+
+    bassEQ = audioContext.createBiquadFilter();
+    bassEQ.type = "lowshelf";
+    bassEQ.frequency.value = 200;
+
+    midEQ = audioContext.createBiquadFilter();
+    midEQ.type = "peaking";
+    midEQ.frequency.value = 1000;
+    midEQ.Q.value = 1;
+
+    trebleEQ = audioContext.createBiquadFilter();
+    trebleEQ.type = "highshelf";
+    trebleEQ.frequency.value = 3000;
+
+    analyser = audioContext.createAnalyser();
+    analyser.fftSize = 256;
+    bufferLength = analyser.frequencyBinCount;
+    dataArray = new Uint8Array(bufferLength);
+
+    // Chain: source -> bass -> mid -> treble -> gain -> analyser -> destination
+    source.connect(bassEQ);
+    bassEQ.connect(midEQ);
+    midEQ.connect(trebleEQ);
+    trebleEQ.connect(gainNode);
+    gainNode.connect(analyser);
+    analyser.connect(audioContext.destination);
+  }
+
+  // Play/Pause button
+  playPauseBtn.addEventListener('click', () => {
+    setupAudioContext();
+    if(audioContext.state === 'suspended') audioContext.resume();
+    if(audio.paused) {
+      audio.play();
+      playPauseBtn.textContent = 'Pause';
+    } else {
+      audio.pause();
+      playPauseBtn.textContent = 'Play';
+    }
+  });
+
+  // Volume control
+  volumeControl.addEventListener('input', () => {
+    if(!gainNode) return;
+    gainNode.gain.value = volumeControl.value;
+  });
+
+  // EQ controls
+  bassControl.addEventListener('input', () => {
+    if(!bassEQ) return;
+    bassEQ.gain.value = bassControl.value;
+  });
+  midControl.addEventListener('input', () => {
+    if(!midEQ) return;
+    midEQ.gain.value = midControl.value;
+  });
+  trebleControl.addEventListener('input', () => {
+    if(!trebleEQ) return;
+    trebleEQ.gain.value = trebleControl.value;
+  });
+
+  // Visualizer
+  function drawVisualizer() {
+    requestAnimationFrame(drawVisualizer);
+
+    analyser.getByteFrequencyData(dataArray);
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const barWidth = (canvas.width / bufferLength) * 2.5 / devicePixelRatio;
+    let barHeight;
+    let x = 0;
+
+    let baseColor = body.classList.contains('dark') ? '#1DB954' : '#1B6E34';
+
+    for(let i = 0; i < bufferLength; i++) {
+      barHeight = dataArray[i];
+      // Gradient color effect on bars
+      const gradient = ctx.createLinearGradient(x, canvas.height / devicePixelRatio, x + barWidth, canvas.height / devicePixelRatio - barHeight);
+      gradient.addColorStop(0, baseColor);
+      gradient.addColorStop(1, `rgba(29, 185, 84, ${barHeight / 255})`);
+      ctx.fillStyle = gradient;
+
+      ctx.fillRect(x, canvas.height / devicePixelRatio - barHeight, barWidth, barHeight);
+      x += barWidth + 1;
+    }
+  }
+  drawVisualizer();
+
+  // Playlist UI update
+  function updatePlaylistUI() {
+    playlistEl.innerHTML = '';
+    playlist.forEach((track, i) => {
+      const div = document.createElement('div');
+      div.textContent = track.name;
+      div.setAttribute('role', 'listitem');
+      if(i === currentIndex) div.classList.add('active');
+      div.addEventListener('click', () => {
+        playTrack(i);
+      });
+      playlistEl.appendChild(div);
+    });
+  }
+
+  // Play track by index
+  function playTrack(index) {
+    if(index < 0 || index >= playlist.length) return;
+    currentIndex = index;
+    audio.src = playlist[currentIndex].url;
+    audio.play();
+    playPauseBtn.textContent = 'Pause';
+    updatePlaylistUI();
+  }
+
+  // Handle file uploads from input or drag/drop
+  function handleFiles(files) {
+    for (const file of files) {
+      if(file.type.startsWith('audio/')) {
+        const url = URL.createObjectURL(file);
+        playlist.push({ url, name: file.name });
       }
-    };
+    }
+    if(currentIndex === -1 && playlist.length > 0) playTrack(0);
+    else updatePlaylistUI();
+  }
 
-    recognition.onerror = (e) => {
-      statusDiv.textContent = "❌ Error: " + e.error;
-    };
-  </script>
+  // Drop zone drag/drop handling
+  dropZone.addEventListener('click', () => upload.click());
+  dropZone.addEventListener('keydown', e => {
+    if(e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      upload.click();
+    }
+  });
+
+  dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('dragover');
+  });
+
+  dropZone.addEventListener('dragleave', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+  });
+
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('dragover');
+    if(e.dataTransfer.files.length > 0) {
+      handleFiles(e.dataTransfer.files);
+    }
+  });
+
+  upload.addEventListener('change', e => {
+    handleFiles(e.target.files);
+  });
+
+  // Reset play button when audio ends
+  audio.addEventListener('ended', () => {
+    playPauseBtn.textContent = 'Play';
+  });
+
+  // Initialize volume to 0.5
+  volumeControl.value = 0.5;
+
+</script>
 </body>
 </html>
