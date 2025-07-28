@@ -1,1 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Talk to AI (Voice)</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    body {
+      background: #121212;
+      color: white;
+      font-family: sans-serif;
+      text-align: center;
+      padding: 2rem;
+    }
+    h1 {
+      margin-bottom: 1rem;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 18px;
+      background: #1e90ff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 1.5rem;
+      color: #ccc;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎙️ Talk to AI</h1>
+  <button id="talkBtn">Start Talking</button>
+  <div id="status">Waiting for input...</div>
+
+  <script>
+    const OPENAI_API_KEY = "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";
+
+    const statusDiv = document.getElementById("status");
+    const talkBtn = document.getElementById("talkBtn");
+    const synth = window.speechSynthesis;
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "en-US";
+    recognition.interimResults = false;
+
+    talkBtn.onclick = () => {
+      recognition.start();
+      statusDiv.textContent = "🎤 Listening...";
+    };
+
+    recognition.onresult = async (event) => {
+      const userText = event.results[0][0].transcript;
+      statusDiv.textContent = `🧍 You: "${userText}"`;
+
+      try {
+        const res = await fetch("https://api.openai.com/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${OPENAI_API_KEY}`
+          },
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: userText }]
+          })
+        });
+
+        const data = await res.json();
+        const reply = data.choices[0].message.content;
+        statusDiv.textContent = `🤖 AI: "${reply}"`;
+
+        const utter = new SpeechSynthesisUtterance(reply);
+        utter.lang = "en-US";
+        synth.speak(utter);
+      } catch (err) {
+        statusDiv.textContent = "❌ Failed to fetch AI reply.";
+      }
+    };
+
+    recognition.onerror = (e) => {
+      statusDiv.textContent = "❌ Error: " + e.error;
+    };
+  </script>
+</body>
+</html>
 
